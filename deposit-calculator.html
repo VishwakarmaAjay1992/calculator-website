@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FD, RD & PPF Calculator — Fixed & Recurring Deposit Maturity | Wealth Planner</title>
+<meta name="description" content="Free calculator for Fixed Deposit, Recurring Deposit, and PPF maturity value. Compare compounding frequencies and see the full year-by-year growth schedule.">
+<link rel="canonical" href="https://example.com/deposit-calculator.html">
+<meta property="og:title" content="FD, RD & PPF Calculator — Fixed & Recurring Deposit Maturity | Wealth Planner">
+<meta property="og:description" content="Free calculator for Fixed Deposit, Recurring Deposit, and PPF maturity value. Compare compounding frequencies and see the full year-by-year growth schedule.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%92%B9</text></svg>">
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a class="site-logo" href="index.html"><span class="mark">💹</span> Wealth Planner</a>
+    <div class="site-links"><a href="index.html">Home</a><a href="sip-calculator.html">SIP</a><a href="swp-calculator.html">SWP</a><a href="loan-emi-calculator.html">Loan EMI</a><a href="deposit-calculator.html" class="current">FD / RD / PPF</a><a href="retirement-calculator.html">Retirement</a><a href="government-schemes-calculator.html">Govt Schemes</a></div>
+  </div>
+</nav>
+<div class="wrap">
+  <header style="border-bottom:none;padding-bottom:0;margin-bottom:24px;display:block;">
+    <p class="eyebrow">FD / RD / PPF Calculator</p>
+    <h1>How much will your deposit actually be worth?</h1>
+    <p class="sub" style="max-width:640px;">Switch between Fixed Deposit, Recurring Deposit, and PPF — each modeled with its real-world compounding rules, not a generic approximation.</p>
+  </header>
+
+  <div id="depositMode" class="deposit-mode">
+
+    <div class="loan-type-tabs" id="depositTypeTabs">
+      <button data-type="fd" class="active">🏦 Fixed Deposit</button>
+      <button data-type="rd">📅 Recurring Deposit</button>
+      <button data-type="ppf">🌱 PPF</button>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2 id="depositPanelTitle">Fixed deposit details</h2>
+
+        <div class="currency-select">
+          <select id="depositCurrency">
+            <option value="₹">₹ INR</option>
+            <option value="$">$ USD</option>
+            <option value="QR">QR QAR</option>
+            <option value="€">€ EUR</option>
+          </select>
+        </div>
+
+        <div class="field" id="depositAmountField">
+          <label id="depositAmountLabel">Deposit amount <span class="val" id="depositAmountVal">500,000</span></label>
+          <div class="range-row"><input type="range" id="depositAmount" min="5000" max="5000000" step="5000" value="500000"><input type="number" class="range-number" id="depositAmountNum" step="any" value="500000"></div>
+        </div>
+        <div class="field">
+          <label>Interest rate (annual) <span class="val" id="depositRateVal">7.25%</span></label>
+          <div class="range-row"><input type="range" id="depositRate" min="3" max="9.5" step="0.05" value="7.25"><input type="number" class="range-number" id="depositRateNum" step="any" value="7.25"></div>
+        </div>
+        <div class="field">
+          <label>Tenure <span class="val" id="depositTenureVal">5 yrs</span></label>
+          <div class="range-row"><input type="range" id="depositTenure" min="1" max="50" step="1" value="5"><input type="number" class="range-number" id="depositTenureNum" step="any" value="5"></div>
+        </div>
+        <div class="field" id="compoundingField">
+          <label>Compounding frequency</label>
+          <select id="depositCompounding" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:14px;background:var(--paper);">
+            <option value="4" selected>Quarterly (typical for FD)</option>
+            <option value="1">Yearly</option>
+            <option value="2">Half-yearly</option>
+            <option value="12">Monthly</option>
+          </select>
+        </div>
+
+        <button class="calc-btn" onclick="calcDeposit()">Calculate</button>
+      </div>
+
+      <div>
+        <div class="kpis">
+          <div class="kpi primary">
+            <div class="lbl" id="depositKpi1Lbl">Maturity value</div>
+            <div class="num" id="depositKpi1">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl" id="depositKpi2Lbl">Total invested</div>
+            <div class="num" id="depositKpi2">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl" id="depositKpi3Lbl">Interest earned</div>
+            <div class="num" id="depositKpi3">—</div>
+          </div>
+        </div>
+
+        <div class="tips-panel">
+          <h3 id="depositTipsTitle">Practical suggestions — Fixed Deposit</h3>
+          <ul id="depositTipsList"></ul>
+        </div>
+
+        <div class="chart-panel">
+          <h3>Invested vs. maturity value over time</h3>
+          <svg id="depositChart" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+
+        <div class="table-panel">
+          <h3>Year-by-year growth</h3>
+          <div class="table-scroll">
+            <table id="depositTable">
+              <thead><tr><th>Year</th><th>Invested this yr</th><th>Cumulative invested</th><th>Year-end value</th><th>Cumulative interest</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="export-row">
+            <span class="note">Exports a workbook with a summary sheet and the full schedule.</span>
+            <button class="export-btn" onclick="exportDeposit()">⬇ Export to Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="article-section">
+<p class="lede">Bank deposits and post-office savings schemes remain the backbone of conservative, risk-free savings in India. But the three most common instruments — FD, RD, and PPF — compound very differently, and getting that mechanic right matters for an accurate maturity estimate.</p>
+
+<h2>Fixed Deposit (FD)</h2>
+<p>An FD is a lump-sum deposit for a fixed tenure at a fixed rate, most commonly compounded quarterly by Indian banks. FD interest is fully taxable at your income slab rate, and banks deduct TDS once interest crosses ₹40,000/year (₹50,000 for senior citizens) in a financial year.</p>
+
+<h2>Recurring Deposit (RD)</h2>
+<p>An RD is the "SIP of fixed income" — a fixed monthly deposit that compounds over the tenure. It builds the same monthly-savings discipline as a SIP, but with a guaranteed, market-independent return, making it well suited to short, certain-timeline goals rather than long-term growth.</p>
+
+<h2>Public Provident Fund (PPF)</h2>
+<p>PPF is a government-backed, long-term scheme with EEE (Exempt-Exempt-Exempt) tax status — your contribution, the interest earned, and the final maturity amount are all tax-free. The rate is reviewed by the Ministry of Finance every quarter, and interest is calculated monthly on the lowest balance between the 5th and last day of the month but credited (and compounded) annually.</p>
+
+<h2>Frequently asked questions</h2>
+<div class="faq-item"><p class="faq-q">Which is better — FD or PPF?</p><p class="faq-a">They serve different purposes. FDs are flexible with tenures from as little as 7 days up to 10 years and are fully taxable; PPF locks your money for 15 years but is completely tax-free and typically pays a comparable or better post-tax return for someone in a higher tax bracket. Many savers use both.</p></div>
+<div class="faq-item"><p class="faq-q">Can I withdraw from PPF before 15 years?</p><p class="faq-a">Partial withdrawals are allowed from the 7th year onward under specific conditions, and a loan against the balance is available between the 3rd and 6th year — but PPF is designed as a long-term, mostly untouched holding.</p></div>
+<div class="faq-item"><p class="faq-q">Is RD interest the same as FD interest for the same rate?</p><p class="faq-a">No — because an RD's monthly deposits each compound for a different length of time (the first deposit compounds the longest, the last barely at all), the effective yield on an RD is lower than an FD of the same headline rate and tenure, holding the same total amount invested.</p></div>
+</div>
+
+<div class="related-tools">
+  <h2>Other calculators on Wealth Planner</h2>
+  <div class="related-grid">
+    <a class="related-card" href="sip-calculator.html"><p class="rt-title">SIP Calculator</p><p class="rt-desc">Project the future value of a monthly investment with optional step-up.</p></a>
+<a class="related-card" href="swp-calculator.html"><p class="rt-title">SWP Calculator</p><p class="rt-desc">Plan a systematic withdrawal income and see how long your corpus lasts.</p></a>
+<a class="related-card" href="loan-emi-calculator.html"><p class="rt-title">Loan EMI Calculator</p><p class="rt-desc">Home, personal, education, car & bike loan EMI with India-specific tips.</p></a>
+<a class="related-card" href="retirement-calculator.html"><p class="rt-title">Retirement Calculator</p><p class="rt-desc">Work out the corpus and monthly SIP you need to retire comfortably.</p></a>
+<a class="related-card" href="government-schemes-calculator.html"><p class="rt-title">Govt Schemes Calculator</p><p class="rt-desc">Sukanya Samriddhi, SCSS, NSC, KVP and Post Office MIS.</p></a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap" style="padding:0;">
+    This tool provides general, educational estimates only — it is not financial, tax, or investment advice. Actual returns, interest rates, and tax rules vary and change over time; please verify current rates and consult a certified financial advisor or chartered accountant before making decisions.
+  </div>
+</footer>
+
+<script src="assets/calculators.js"></script>
+</body>
+</html>

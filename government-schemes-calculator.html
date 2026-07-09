@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sukanya Samriddhi, SCSS, NSC, KVP & POMIS Calculator | Wealth Planner</title>
+<meta name="description" content="Free calculator for Indian government savings schemes: Sukanya Samriddhi Yojana, Senior Citizens' Savings Scheme, NSC, Kisan Vikas Patra, and Post Office MIS — with current rates.">
+<link rel="canonical" href="https://example.com/government-schemes-calculator.html">
+<meta property="og:title" content="Sukanya Samriddhi, SCSS, NSC, KVP & POMIS Calculator | Wealth Planner">
+<meta property="og:description" content="Free calculator for Indian government savings schemes: Sukanya Samriddhi Yojana, Senior Citizens' Savings Scheme, NSC, Kisan Vikas Patra, and Post Office MIS — with current rates.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%92%B9</text></svg>">
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a class="site-logo" href="index.html"><span class="mark">💹</span> Wealth Planner</a>
+    <div class="site-links"><a href="index.html">Home</a><a href="sip-calculator.html">SIP</a><a href="swp-calculator.html">SWP</a><a href="loan-emi-calculator.html">Loan EMI</a><a href="deposit-calculator.html">FD / RD / PPF</a><a href="retirement-calculator.html">Retirement</a><a href="government-schemes-calculator.html" class="current">Govt Schemes</a></div>
+  </div>
+</nav>
+<div class="wrap">
+  <header style="border-bottom:none;padding-bottom:0;margin-bottom:24px;display:block;">
+    <p class="eyebrow">Government Schemes Calculator</p>
+    <h1>What do India's safest savings schemes actually pay?</h1>
+    <p class="sub" style="max-width:640px;">Switch between Sukanya Samriddhi Yojana, SCSS, NSC, KVP, and Post Office MIS — each calculated with its real rules, current quarterly rate, and eligibility criteria.</p>
+  </header>
+
+  <div id="govtMode" class="govt-mode">
+
+    <div class="loan-type-tabs" id="govtTypeTabs">
+      <button data-type="ssy" class="active">👧 Sukanya Samriddhi</button>
+      <button data-type="scss">🧓 Senior Citizens Scheme</button>
+      <button data-type="nsc">📜 NSC</button>
+      <button data-type="kvp">📈 Kisan Vikas Patra</button>
+      <button data-type="pomis">✉️ Post Office MIS</button>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2 id="govtPanelTitle">Sukanya Samriddhi Yojana details</h2>
+        <div class="eligibility-note" id="govtEligibility"></div>
+
+        <div class="currency-select">
+          <select id="govtCurrency">
+            <option value="₹">₹ INR</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label id="govtAmountLabel">Annual deposit <span class="val" id="govtAmountVal">150,000</span></label>
+          <div class="range-row"><input type="range" id="govtAmount" min="250" max="150000" step="250" value="150000"><input type="number" class="range-number" id="govtAmountNum" step="any" value="150000"></div>
+        </div>
+        <div class="field">
+          <label>Interest rate (annual) <span class="val" id="govtRateVal">8.2%</span></label>
+          <div class="range-row"><input type="range" id="govtRate" min="4" max="9.5" step="0.1" value="8.2"><input type="number" class="range-number" id="govtRateNum" step="any" value="8.2"></div>
+        </div>
+        <div class="field" id="govtTenureField">
+          <label id="govtTenureLabel">Tenure <span class="val" id="govtTenureVal">21 yrs</span></label>
+          <div class="range-row"><input type="range" id="govtTenure" min="21" max="21" step="1" value="21"><input type="number" class="range-number" id="govtTenureNum" step="any" value="21"></div>
+        </div>
+
+        <button class="calc-btn" onclick="calcGovt()">Calculate</button>
+      </div>
+
+      <div>
+        <div class="kpis">
+          <div class="kpi primary">
+            <div class="lbl" id="govtKpi1Lbl">Maturity value</div>
+            <div class="num" id="govtKpi1">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl" id="govtKpi2Lbl">Total invested</div>
+            <div class="num" id="govtKpi2">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl" id="govtKpi3Lbl">Interest earned</div>
+            <div class="num" id="govtKpi3">—</div>
+          </div>
+        </div>
+
+        <div class="tips-panel">
+          <h3 id="govtTipsTitle">Practical suggestions — Sukanya Samriddhi Yojana</h3>
+          <ul id="govtTipsList"></ul>
+        </div>
+
+        <div class="chart-panel">
+          <h3>Invested vs. value over time</h3>
+          <svg id="govtChart" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+
+        <div class="table-panel">
+          <h3>Year-by-year schedule</h3>
+          <div class="table-scroll">
+            <table id="govtTable">
+              <thead><tr><th>Year</th><th>Invested this yr</th><th>Cumulative invested</th><th>Year-end value</th><th>Cumulative gain</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="export-row">
+            <span class="note">Exports a workbook with a summary sheet and the full schedule.</span>
+            <button class="export-btn" onclick="exportGovt()">⬇ Export to Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="article-section">
+<p class="lede">India's small savings schemes are sovereign-backed, meaning the government guarantees the return — no market risk. Rates are reviewed by the Ministry of Finance every quarter and have stayed unusually stable in recent years, but each scheme has its own compounding rule, tenure, and eligibility criteria, which this calculator models individually rather than treating them as interchangeable.</p>
+
+<h2>Sukanya Samriddhi Yojana (SSY)</h2>
+<p>Built specifically for a girl child's future, SSY currently offers the highest rate among small savings schemes and is fully tax-free (EEE status). Deposits are made for the first 15 years; the balance then continues compounding untouched until the account matures 21 years after opening.</p>
+
+<h2>Senior Citizens' Savings Scheme (SCSS)</h2>
+<p>Designed for retirement income, SCSS pays interest out quarterly rather than compounding it — meaning your principal itself doesn't grow, but you receive a steady, government-guaranteed income stream every quarter, fully taxable at your slab rate.</p>
+
+<h2>National Savings Certificate (NSC)</h2>
+<p>A simple 5-year, annually compounding certificate. The accrued interest each year (except the final year) is deemed reinvested and also qualifies for a Section 80C deduction, which can offset the fact that this "phantom income" is taxable even though you receive nothing until maturity.</p>
+
+<h2>Kisan Vikas Patra (KVP)</h2>
+<p>KVP's entire appeal is simplicity: your investment doubles in a fixed, government-notified period (currently around 115 months) with no tax deduction on the investment, and fully taxable interest.</p>
+
+<h2>Post Office Monthly Income Scheme (POMIS)</h2>
+<p>Similar in spirit to SCSS but open to any adult, not just seniors — POMIS pays a fixed monthly income on a 5-year deposit, capped at ₹9 lakh for a single account or ₹15 lakh jointly.</p>
+
+<h2>Frequently asked questions</h2>
+<div class="faq-item"><p class="faq-q">Are these small savings scheme rates fixed for the full tenure?</p><p class="faq-a">It depends on the scheme. PPF, SCSS, and SSY rates can be revised each quarter by the government (though your accrued balance keeps its already-earned interest). NSC and KVP rates are locked in at the time of purchase and don't change for that certificate's full term, even if the rate for new purchases changes later.</p></div>
+<div class="faq-item"><p class="faq-q">Which scheme has the highest current interest rate?</p><p class="faq-a">As of the most recent quarter reflected in this calculator, Sukanya Samriddhi Yojana and the Senior Citizens' Savings Scheme share the highest rate among the major small savings schemes — but SSY is restricted to a girl child's account, and SCSS is restricted to those 60 and above (55+ for certain retirees).</p></div>
+<div class="faq-item"><p class="faq-q">Do any of these schemes offer tax-free returns?</p><p class="faq-a">PPF and Sukanya Samriddhi Yojana both carry full EEE (Exempt-Exempt-Exempt) tax status — contribution, interest, and maturity amount are all tax-free. SCSS, NSC, KVP, and POMIS interest is taxable, though NSC's reinvested interest can still count toward your Section 80C limit.</p></div>
+</div>
+
+<div class="related-tools">
+  <h2>Other calculators on Wealth Planner</h2>
+  <div class="related-grid">
+    <a class="related-card" href="sip-calculator.html"><p class="rt-title">SIP Calculator</p><p class="rt-desc">Project the future value of a monthly investment with optional step-up.</p></a>
+<a class="related-card" href="swp-calculator.html"><p class="rt-title">SWP Calculator</p><p class="rt-desc">Plan a systematic withdrawal income and see how long your corpus lasts.</p></a>
+<a class="related-card" href="loan-emi-calculator.html"><p class="rt-title">Loan EMI Calculator</p><p class="rt-desc">Home, personal, education, car & bike loan EMI with India-specific tips.</p></a>
+<a class="related-card" href="deposit-calculator.html"><p class="rt-title">FD / RD / PPF Calculator</p><p class="rt-desc">Fixed deposit, recurring deposit, and PPF maturity value.</p></a>
+<a class="related-card" href="retirement-calculator.html"><p class="rt-title">Retirement Calculator</p><p class="rt-desc">Work out the corpus and monthly SIP you need to retire comfortably.</p></a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap" style="padding:0;">
+    This tool provides general, educational estimates only — it is not financial, tax, or investment advice. Actual returns, interest rates, and tax rules vary and change over time; please verify current rates and consult a certified financial advisor or chartered accountant before making decisions.
+  </div>
+</footer>
+
+<script src="assets/calculators.js"></script>
+</body>
+</html>

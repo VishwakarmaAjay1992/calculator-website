@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWP Calculator — Systematic Withdrawal Plan Calculator | Wealth Planner</title>
+<meta name="description" content="Free SWP calculator to plan a monthly income from your investment corpus. See exactly how long your money lasts at a given withdrawal rate and return assumption.">
+<link rel="canonical" href="https://example.com/swp-calculator.html">
+<meta property="og:title" content="SWP Calculator — Systematic Withdrawal Plan Calculator | Wealth Planner">
+<meta property="og:description" content="Free SWP calculator to plan a monthly income from your investment corpus. See exactly how long your money lasts at a given withdrawal rate and return assumption.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%92%B9</text></svg>">
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a class="site-logo" href="index.html"><span class="mark">💹</span> Wealth Planner</a>
+    <div class="site-links"><a href="index.html">Home</a><a href="sip-calculator.html">SIP</a><a href="swp-calculator.html" class="current">SWP</a><a href="loan-emi-calculator.html">Loan EMI</a><a href="deposit-calculator.html">FD / RD / PPF</a><a href="retirement-calculator.html">Retirement</a><a href="government-schemes-calculator.html">Govt Schemes</a></div>
+  </div>
+</nav>
+<div class="wrap">
+  <header style="border-bottom:none;padding-bottom:0;margin-bottom:24px;display:block;">
+    <p class="eyebrow">SWP Calculator</p>
+    <h1>How long will your corpus really last?</h1>
+    <p class="sub" style="max-width:640px;">Enter your corpus, a monthly withdrawal amount, and an expected return — see whether your money outlasts your withdrawal plan, and for how long.</p>
+  </header>
+
+  <div id="swpMode" class="swp-mode">
+    <div class="grid">
+      <div class="panel">
+        <h2>Your withdrawal plan</h2>
+
+        <div class="currency-select">
+          <select id="swpCurrency">
+            <option value="₹">₹ INR</option>
+            <option value="$">$ USD</option>
+            <option value="QR">QR QAR</option>
+            <option value="€">€ EUR</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Starting corpus <span class="val" id="swpCorpusVal">2,000,000</span></label>
+          <div class="range-row"><input type="range" id="swpCorpus" min="50000" max="20000000" step="50000" value="2000000"><input type="number" class="range-number" id="swpCorpusNum" step="any" value="2000000"></div>
+        </div>
+        <div class="field">
+          <label>Monthly withdrawal <span class="val" id="swpWithdrawVal">15,000</span></label>
+          <div class="range-row"><input type="range" id="swpWithdraw" min="500" max="500000" step="500" value="15000"><input type="number" class="range-number" id="swpWithdrawNum" step="any" value="15000"></div>
+        </div>
+        <div class="field">
+          <label>Expected annual return <span class="val" id="swpReturnVal">8%</span></label>
+          <div class="range-row"><input type="range" id="swpReturn" min="0" max="25" step="0.5" value="8"><input type="number" class="range-number" id="swpReturnNum" step="any" value="8"></div>
+        </div>
+        <div class="field">
+          <label>Withdrawal period <span class="val" id="swpYearsVal">20 yrs</span></label>
+          <div class="range-row"><input type="range" id="swpYears" min="1" max="40" step="1" value="20"><input type="number" class="range-number" id="swpYearsNum" step="any" value="20"></div>
+        </div>
+
+        <button class="calc-btn" onclick="calcSWP()">Calculate</button>
+        <p id="swpWarn"></p>
+      </div>
+
+      <div>
+        <div class="kpis">
+          <div class="kpi primary">
+            <div class="lbl">Total withdrawn</div>
+            <div class="num" id="swpTotalOut">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl">Closing balance</div>
+            <div class="num" id="swpClosing">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl">Corpus lasts</div>
+            <div class="num" id="swpLasts">—</div>
+          </div>
+        </div>
+
+        <div class="chart-panel">
+          <h3>Remaining balance over time</h3>
+          <svg id="swpChart" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+
+        <div class="table-panel">
+          <h3>Year-by-year schedule</h3>
+          <div class="table-scroll">
+            <table id="swpTable">
+              <thead><tr><th>Year</th><th>Withdrawn this yr</th><th>Cumulative withdrawn</th><th>Growth earned</th><th>Year-end balance</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="export-row">
+            <span class="note">Exports a workbook with a summary sheet and the full monthly schedule.</span>
+            <button class="export-btn" onclick="exportSWP()">⬇ Export to Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="article-section">
+<p class="lede">A Systematic Withdrawal Plan (SWP) is the mirror image of a SIP: instead of investing a fixed amount every month, you withdraw one, while the rest of your corpus stays invested and continues to grow (or shrink, if withdrawals outpace returns).</p>
+
+<h2>How this SWP calculator works</h2>
+<p>Each month, the calculator applies your expected monthly return to the remaining balance, then subtracts your withdrawal — compounding the growth on whatever's left, exactly the way an actual SWP from a mutual fund works. If your withdrawal exceeds what the corpus can sustain, the calculator flags the exact month your corpus is projected to run out.</p>
+
+<h3>The core trade-off: withdrawal rate vs. corpus life</h3>
+<p>The single biggest lever in an SWP is your withdrawal rate — the percentage of your corpus you draw out each year. A withdrawal rate comfortably below your expected return lets the corpus sustain itself indefinitely or even grow; a rate above it guarantees depletion, just a question of when. This calculator makes that math visible instead of leaving it as a guess.</p>
+
+<h3>SWP vs. simply spending savings</h3>
+<p>Keeping a retirement or income corpus invested via an SWP — rather than parking it entirely in a low-yield savings account and drawing down — lets the invested portion continue compounding while you withdraw only what you need each month. This is one reason SWPs are commonly used for retirement income planning in India, often from equity or hybrid mutual funds, though the mix should reflect your risk tolerance and how soon you need the money.</p>
+
+<h2>Frequently asked questions</h2>
+<div class="faq-item"><p class="faq-q">Is SWP income taxable?</p><p class="faq-a">Withdrawals from a mutual fund SWP are treated as redemptions, so the gain portion (not the whole withdrawal) is subject to capital gains tax, at rates that depend on the fund type and holding period. This is generally more tax-efficient than fully taxable interest income, but you should confirm current rules with a tax advisor since capital gains tax treatment can change.</p></div>
+<div class="faq-item"><p class="faq-q">What withdrawal rate is considered safe?</p><p class="faq-a">There is no universal number, but many planners treat an annual withdrawal rate in the range of 4–6% of the corpus, adjusted for your specific return assumptions and time horizon, as a starting point for testing sustainability — this calculator lets you test your own assumptions directly rather than relying on a rule of thumb.</p></div>
+<div class="faq-item"><p class="faq-q">Can I combine SIP and SWP in one plan?</p><p class="faq-a">Yes — this is a common pattern: run a SIP during your working years to build the corpus, then switch to an SWP after retirement to draw an income from it. The Retirement calculator on this site models exactly that combined journey in one place.</p></div>
+</div>
+
+<div class="related-tools">
+  <h2>Other calculators on Wealth Planner</h2>
+  <div class="related-grid">
+    <a class="related-card" href="sip-calculator.html"><p class="rt-title">SIP Calculator</p><p class="rt-desc">Project the future value of a monthly investment with optional step-up.</p></a>
+<a class="related-card" href="loan-emi-calculator.html"><p class="rt-title">Loan EMI Calculator</p><p class="rt-desc">Home, personal, education, car & bike loan EMI with India-specific tips.</p></a>
+<a class="related-card" href="deposit-calculator.html"><p class="rt-title">FD / RD / PPF Calculator</p><p class="rt-desc">Fixed deposit, recurring deposit, and PPF maturity value.</p></a>
+<a class="related-card" href="retirement-calculator.html"><p class="rt-title">Retirement Calculator</p><p class="rt-desc">Work out the corpus and monthly SIP you need to retire comfortably.</p></a>
+<a class="related-card" href="government-schemes-calculator.html"><p class="rt-title">Govt Schemes Calculator</p><p class="rt-desc">Sukanya Samriddhi, SCSS, NSC, KVP and Post Office MIS.</p></a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap" style="padding:0;">
+    This tool provides general, educational estimates only — it is not financial, tax, or investment advice. Actual returns, interest rates, and tax rules vary and change over time; please verify current rates and consult a certified financial advisor or chartered accountant before making decisions.
+  </div>
+</footer>
+
+<script src="assets/calculators.js"></script>
+</body>
+</html>

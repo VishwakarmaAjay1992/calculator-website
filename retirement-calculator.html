@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retirement Calculator India — How Much Corpus & SIP You Need | Wealth Planner</title>
+<meta name="description" content="Free retirement planning calculator for India. Enter your age, expenses, and inflation assumptions to see the retirement corpus you need and the monthly SIP required to get there.">
+<link rel="canonical" href="https://example.com/retirement-calculator.html">
+<meta property="og:title" content="Retirement Calculator India — How Much Corpus & SIP You Need | Wealth Planner">
+<meta property="og:description" content="Free retirement planning calculator for India. Enter your age, expenses, and inflation assumptions to see the retirement corpus you need and the monthly SIP required to get there.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%92%B9</text></svg>">
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a class="site-logo" href="index.html"><span class="mark">💹</span> Wealth Planner</a>
+    <div class="site-links"><a href="index.html">Home</a><a href="sip-calculator.html">SIP</a><a href="swp-calculator.html">SWP</a><a href="loan-emi-calculator.html">Loan EMI</a><a href="deposit-calculator.html">FD / RD / PPF</a><a href="retirement-calculator.html" class="current">Retirement</a><a href="government-schemes-calculator.html">Govt Schemes</a></div>
+  </div>
+</nav>
+<div class="wrap">
+  <header style="border-bottom:none;padding-bottom:0;margin-bottom:24px;display:block;">
+    <p class="eyebrow">Retirement Calculator</p>
+    <h1>What does retirement actually cost, in today's and tomorrow's rupees?</h1>
+    <p class="sub" style="max-width:640px;">This calculator works backward from your future monthly expense to the corpus you need, and forward from today to the monthly SIP that gets you there.</p>
+  </header>
+
+  <div id="retireMode" class="retire-mode">
+    <div class="grid">
+      <div class="panel">
+        <h2>Your retirement goal</h2>
+
+        <div class="currency-select">
+          <select id="retireCurrency">
+            <option value="₹">₹ INR</option>
+            <option value="$">$ USD</option>
+            <option value="QR">QR QAR</option>
+            <option value="€">€ EUR</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Current age <span class="val" id="retireCurAgeVal">30</span></label>
+          <div class="range-row"><input type="range" id="retireCurAge" min="18" max="65" step="1" value="30"><input type="number" class="range-number" id="retireCurAgeNum" step="any" value="30"></div>
+        </div>
+        <div class="field">
+          <label>Retirement age <span class="val" id="retireAgeVal">60</span></label>
+          <div class="range-row"><input type="range" id="retireAge" min="35" max="75" step="1" value="60"><input type="number" class="range-number" id="retireAgeNum" step="any" value="60"></div>
+        </div>
+        <div class="field">
+          <label>Life expectancy <span class="val" id="retireLifeVal">85</span></label>
+          <div class="range-row"><input type="range" id="retireLife" min="70" max="100" step="1" value="85"><input type="number" class="range-number" id="retireLifeNum" step="any" value="85"></div>
+        </div>
+        <div class="field">
+          <label>Monthly expense today <span class="val" id="retireExpenseVal">50,000</span></label>
+          <div class="range-row"><input type="range" id="retireExpense" min="5000" max="1000000" step="1000" value="50000"><input type="number" class="range-number" id="retireExpenseNum" step="any" value="50000"></div>
+        </div>
+        <div class="field">
+          <label>Expected inflation <span class="val" id="retireInflationVal">6%</span></label>
+          <div class="range-row"><input type="range" id="retireInflation" min="2" max="10" step="0.5" value="6"><input type="number" class="range-number" id="retireInflationNum" step="any" value="6"></div>
+        </div>
+        <div class="field">
+          <label>Return before retirement <span class="val" id="retirePreReturnVal">12%</span></label>
+          <div class="range-row"><input type="range" id="retirePreReturn" min="4" max="20" step="0.5" value="12"><input type="number" class="range-number" id="retirePreReturnNum" step="any" value="12"></div>
+        </div>
+        <div class="field">
+          <label>Return after retirement <span class="val" id="retirePostReturnVal">7%</span></label>
+          <div class="range-row"><input type="range" id="retirePostReturn" min="2" max="15" step="0.5" value="7"><input type="number" class="range-number" id="retirePostReturnNum" step="any" value="7"></div>
+        </div>
+        <div class="field">
+          <label>Existing retirement savings <span class="val" id="retireExistingVal">0</span></label>
+          <div class="range-row"><input type="range" id="retireExisting" min="0" max="20000000" step="50000" value="0"><input type="number" class="range-number" id="retireExistingNum" step="any" value="0"></div>
+        </div>
+
+        <button class="calc-btn" onclick="calcRetirement()">Calculate</button>
+      </div>
+
+      <div>
+        <div class="kpis">
+          <div class="kpi primary">
+            <div class="lbl">Corpus needed at retirement</div>
+            <div class="num" id="retireCorpus">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl">Required monthly SIP</div>
+            <div class="num" id="retireSIP">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl">Monthly expense at retirement</div>
+            <div class="num" id="retireFutureExpense">—</div>
+          </div>
+        </div>
+
+        <div class="tips-panel">
+          <h3>Practical suggestions — Retirement Planning</h3>
+          <ul>
+            <li>This assumes your monthly withdrawal grows with inflation every year in retirement, so your purchasing power stays constant — a more realistic (and more demanding) target than a flat withdrawal.</li>
+            <li>Spread the required SIP across EPF, NPS, PPF, and equity mutual funds rather than one instrument — NPS also gives an extra ₹50,000 deduction under Section 80CCD(1B) on top of the ₹1.5L Section 80C limit.</li>
+            <li>Revisit this plan every 2–3 years. Income, expenses, and market conditions change — a retirement plan is a living document, not a one-time calculation.</li>
+            <li>If the required SIP looks out of reach today, a later retirement age or a higher equity allocation early on (when you can absorb volatility) usually closes the gap faster than cutting today's expenses.</li>
+          </ul>
+        </div>
+
+        <div class="chart-panel">
+          <h3>Corpus over your lifetime — build-up, then draw-down</h3>
+          <svg id="retireChart" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+
+        <div class="table-panel">
+          <h3>Year-by-year projection</h3>
+          <div class="table-scroll">
+            <table id="retireTable">
+              <thead><tr><th>Age</th><th>Phase</th><th>Contribution / withdrawal</th><th>Year-end corpus</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="export-row">
+            <span class="note">Exports a workbook with a summary sheet and the full year-by-year projection.</span>
+            <button class="export-btn" onclick="exportRetirement()">⬇ Export to Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="article-section">
+<p class="lede">Most retirement "rules of thumb" (like "save 25x your annual expense") ignore two things that matter enormously: inflation between now and retirement, and inflation during retirement itself, since your expenses keep rising even after you stop earning.</p>
+
+<h2>How this calculator is different</h2>
+<p>Rather than using a simplified formula, this tool actually simulates your retirement month by month: your monthly expense grows with inflation every year you're retired, while your remaining corpus earns your assumed post-retirement return. It then works backward — via search rather than a rough approximation — to find the minimum corpus that doesn't run out before your specified life expectancy, accounting for any existing retirement savings you already have.</p>
+
+<h2>The two numbers that matter most</h2>
+<h3>1. Corpus needed at retirement</h3>
+<p>This is the amount you need on the day you retire so that inflation-adjusted monthly withdrawals, growing every year, don't outlast your expected lifespan.</p>
+<h3>2. Required monthly SIP</h3>
+<p>Working from today's date to your retirement age, this is the monthly investment — assumed to grow at your specified pre-retirement return — needed to close the gap between your existing savings and the corpus required.</p>
+
+<h3>Why the return assumption split matters</h3>
+<p>Pre-retirement, most people can afford more equity exposure and a higher assumed return, since they have years to ride out volatility. Post-retirement, a more conservative, income-oriented allocation is common, since a market downturn early in retirement can permanently damage a corpus that's simultaneously being drawn down — a risk known as "sequence of returns risk." This calculator deliberately asks for both return rates separately rather than one blended number.</p>
+
+<h2>Frequently asked questions</h2>
+<div class="faq-item"><p class="faq-q">What inflation rate should I assume for retirement planning?</p><p class="faq-a">India's long-term consumer inflation has broadly averaged in the range of 5–7% over extended periods, though it varies year to year. Many planners use 6% as a starting assumption, but it is worth testing your plan at a higher rate too, since underestimating inflation is the most common retirement-planning mistake.</p></div>
+<div class="faq-item"><p class="faq-q">Should NPS be part of my retirement plan?</p><p class="faq-a">The National Pension System (NPS) offers an additional tax deduction of ₹50,000 under Section 80CCD(1B), on top of the ₹1.5 lakh Section 80C limit, making it a common complement to EPF, PPF, and equity SIPs in a retirement portfolio — though it comes with its own withdrawal and annuitization rules worth understanding separately.</p></div>
+<div class="faq-item"><p class="faq-q">What if the required monthly SIP looks unaffordable?</p><p class="faq-a">A later retirement age, a higher pre-retirement return (via more equity allocation while you have time to absorb volatility), or a lower post-retirement expense target are usually more effective levers than simply lowering today's spending — try adjusting the retirement age slider to see the effect.</p></div>
+</div>
+
+<div class="related-tools">
+  <h2>Other calculators on Wealth Planner</h2>
+  <div class="related-grid">
+    <a class="related-card" href="sip-calculator.html"><p class="rt-title">SIP Calculator</p><p class="rt-desc">Project the future value of a monthly investment with optional step-up.</p></a>
+<a class="related-card" href="swp-calculator.html"><p class="rt-title">SWP Calculator</p><p class="rt-desc">Plan a systematic withdrawal income and see how long your corpus lasts.</p></a>
+<a class="related-card" href="loan-emi-calculator.html"><p class="rt-title">Loan EMI Calculator</p><p class="rt-desc">Home, personal, education, car & bike loan EMI with India-specific tips.</p></a>
+<a class="related-card" href="deposit-calculator.html"><p class="rt-title">FD / RD / PPF Calculator</p><p class="rt-desc">Fixed deposit, recurring deposit, and PPF maturity value.</p></a>
+<a class="related-card" href="government-schemes-calculator.html"><p class="rt-title">Govt Schemes Calculator</p><p class="rt-desc">Sukanya Samriddhi, SCSS, NSC, KVP and Post Office MIS.</p></a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap" style="padding:0;">
+    This tool provides general, educational estimates only — it is not financial, tax, or investment advice. Actual returns, interest rates, and tax rules vary and change over time; please verify current rates and consult a certified financial advisor or chartered accountant before making decisions.
+  </div>
+</footer>
+
+<script src="assets/calculators.js"></script>
+</body>
+</html>

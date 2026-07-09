@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loan EMI Calculator — Home, Personal, Education, Car & Bike Loans | Wealth Planner</title>
+<meta name="description" content="Free EMI calculator for home, personal, education, and car/bike loans in India. See your monthly EMI, total interest, full amortization schedule, and practical borrowing tips.">
+<link rel="canonical" href="https://example.com/loan-emi-calculator.html">
+<meta property="og:title" content="Loan EMI Calculator — Home, Personal, Education, Car & Bike Loans | Wealth Planner">
+<meta property="og:description" content="Free EMI calculator for home, personal, education, and car/bike loans in India. See your monthly EMI, total interest, full amortization schedule, and practical borrowing tips.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%92%B9</text></svg>">
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a class="site-logo" href="index.html"><span class="mark">💹</span> Wealth Planner</a>
+    <div class="site-links"><a href="index.html">Home</a><a href="sip-calculator.html">SIP</a><a href="swp-calculator.html">SWP</a><a href="loan-emi-calculator.html" class="current">Loan EMI</a><a href="deposit-calculator.html">FD / RD / PPF</a><a href="retirement-calculator.html">Retirement</a><a href="government-schemes-calculator.html">Govt Schemes</a></div>
+  </div>
+</nav>
+<div class="wrap">
+  <header style="border-bottom:none;padding-bottom:0;margin-bottom:24px;display:block;">
+    <p class="eyebrow">Loan EMI Calculator</p>
+    <h1>What will this loan actually cost you?</h1>
+    <p class="sub" style="max-width:640px;">Switch between home, personal, education, and car/bike loans — each with realistic Indian rate ranges, an amortization schedule, and tips specific to that loan type.</p>
+  </header>
+
+  <div id="loanMode" class="loan-mode">
+
+    <div class="loan-type-tabs" id="loanTypeTabs">
+      <button data-type="home" class="active">🏠 Home Loan</button>
+      <button data-type="personal">💳 Personal Loan</button>
+      <button data-type="education">🎓 Education Loan</button>
+      <button data-type="vehicle">🚗 Car &amp; Bike Loan</button>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2 id="loanPanelTitle">Home loan details</h2>
+
+        <div class="currency-select">
+          <select id="loanCurrency">
+            <option value="₹">₹ INR</option>
+            <option value="$">$ USD</option>
+            <option value="QR">QR QAR</option>
+            <option value="€">€ EUR</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Loan amount <span class="val" id="loanAmountVal">3,500,000</span></label>
+          <div class="range-row"><input type="range" id="loanAmount" min="50000" max="20000000" step="10000" value="3500000"><input type="number" class="range-number" id="loanAmountNum" step="any" value="3500000"></div>
+        </div>
+        <div class="field">
+          <label>Interest rate (annual) <span class="val" id="loanRateVal">8.5%</span></label>
+          <div class="range-row"><input type="range" id="loanRate" min="5" max="26" step="0.1" value="8.5"><input type="number" class="range-number" id="loanRateNum" step="any" value="8.5"></div>
+        </div>
+        <div class="field">
+          <label>Loan tenure <span class="val" id="loanTenureVal">20 yrs</span></label>
+          <div class="range-row"><input type="range" id="loanTenure" min="1" max="30" step="1" value="20"><input type="number" class="range-number" id="loanTenureNum" step="any" value="20"></div>
+        </div>
+        <div class="field">
+          <label>Processing fee <span class="val" id="loanFeeVal">0.5%</span></label>
+          <div class="range-row"><input type="range" id="loanFee" min="0" max="3" step="0.1" value="0.5"><input type="number" class="range-number" id="loanFeeNum" step="any" value="0.5"></div>
+        </div>
+        <div class="field">
+          <label>Your monthly income <span class="val" id="loanIncomeVal">Optional</span></label>
+          <div class="range-row"><input type="range" id="loanIncome" min="0" max="1000000" step="5000" value="0"><input type="number" class="range-number" id="loanIncomeNum" step="any" value="0"></div>
+        </div>
+
+        <button class="calc-btn" onclick="calcLoan()">Calculate EMI</button>
+        <p class="note" style="margin-top:14px;">Income is used only to check your EMI against the ~40% FOIR guideline Indian lenders typically apply — nothing is stored or sent anywhere.</p>
+      </div>
+
+      <div>
+        <div class="kpis">
+          <div class="kpi primary">
+            <div class="lbl">Monthly EMI</div>
+            <div class="num" id="loanEMI">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl">Total interest</div>
+            <div class="num" id="loanInterest">—</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl">Total payment</div>
+            <div class="num" id="loanTotal">—</div>
+          </div>
+        </div>
+
+        <div class="tips-panel">
+          <h3 id="tipsTitle">Practical suggestions — Home Loan</h3>
+          <ul id="tipsList"></ul>
+          <div class="foir-line" id="foirLine">
+            <span>EMI as a share of your monthly income</span>
+            <span class="foir-pill" id="foirPill">—</span>
+          </div>
+        </div>
+
+        <div class="chart-panel">
+          <h3>Principal vs. interest over the loan term</h3>
+          <svg id="loanChart" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+
+        <div class="table-panel">
+          <h3>Year-by-year amortization</h3>
+          <div class="table-scroll">
+            <table id="loanTable">
+              <thead><tr><th>Year</th><th>Principal paid</th><th>Interest paid</th><th>Cumulative interest</th><th>Balance</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="export-row">
+            <span class="note">Exports a workbook with a summary sheet and the full monthly repayment schedule.</span>
+            <button class="export-btn" onclick="exportLoan()">⬇ Export to Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="article-section">
+<p class="lede">An EMI (Equated Monthly Installment) is the fixed monthly payment on a loan, combining both principal and interest. Early in a loan's life, most of each EMI goes toward interest; only later does the principal portion start dominating — which is exactly why prepaying a loan early saves disproportionately more interest than prepaying the same amount later.</p>
+
+<h2>How EMI is calculated</h2>
+<p>This calculator uses the standard reducing-balance EMI formula used by Indian banks and NBFCs:</p>
+<p><code>EMI = P × r × (1+r)^n / ((1+r)^n − 1)</code></p>
+<p>Where <code>P</code> is the loan amount, <code>r</code> is the monthly interest rate (annual rate ÷ 12), and <code>n</code> is the total number of monthly installments.</p>
+
+<h3>Home loan</h3>
+<p>Home loans carry the lowest rates among common retail loans, since the property itself secures the loan. Principal repayment qualifies for a deduction under Section 80C (up to ₹1.5 lakh/year) and interest under Section 24(b) (up to ₹2 lakh/year for a self-occupied property) — both of which meaningfully lower the real, post-tax cost, and are reflected in this calculator's tips.</p>
+
+<h3>Personal loan</h3>
+<p>Personal loans need no collateral, which is why rates run considerably higher than secured loans. There is no tax benefit in the typical case, so treat the full EMI as a real cost, and keep the tenure as short as you can afford.</p>
+
+<h3>Education loan</h3>
+<p>Education loans usually include a moratorium period — repayment (or at least full EMI repayment) typically starts 6–12 months after course completion, not immediately. The full interest paid is deductible without an upper cap under Section 80E for 8 years from when repayment begins, a materially better tax treatment than a personal loan.</p>
+
+<h3>Car & bike loan</h3>
+<p>Vehicles depreciate 15–20% a year, so a loan tenure that outlasts the vehicle's useful resale value works against you. Keeping the tenure short — generally 5 years or less for a car, 3 years or less for a bike — avoids owing more than the vehicle is worth for longer than necessary.</p>
+
+<h2>Frequently asked questions</h2>
+<div class="faq-item"><p class="faq-q">What is a good FOIR (EMI-to-income ratio)?</p><p class="faq-a">Indian lenders commonly look for total EMIs (across all loans) to stay under roughly 40–50% of monthly income, often called the Fixed Obligation to Income Ratio (FOIR). This calculator includes an optional income field that checks your EMI against that guideline.</p></div>
+<div class="faq-item"><p class="faq-q">Does prepaying a loan early actually save much?</p><p class="faq-a">Yes, disproportionately so — because interest is charged on the reducing balance, an early prepayment removes principal while more months of interest were still ahead of it, saving more than the same prepayment made later in the loan's life. The amortization table in this calculator shows exactly how the principal/interest split shifts over time.</p></div>
+<div class="faq-item"><p class="faq-q">Is loan interest always simple to compare across lenders?</p><p class="faq-a">Not from the headline rate alone — always compare the effective annual rate including processing fees and any bundled insurance, not just the advertised interest rate, since two loans with the same rate can have meaningfully different real costs.</p></div>
+</div>
+
+<div class="related-tools">
+  <h2>Other calculators on Wealth Planner</h2>
+  <div class="related-grid">
+    <a class="related-card" href="sip-calculator.html"><p class="rt-title">SIP Calculator</p><p class="rt-desc">Project the future value of a monthly investment with optional step-up.</p></a>
+<a class="related-card" href="swp-calculator.html"><p class="rt-title">SWP Calculator</p><p class="rt-desc">Plan a systematic withdrawal income and see how long your corpus lasts.</p></a>
+<a class="related-card" href="deposit-calculator.html"><p class="rt-title">FD / RD / PPF Calculator</p><p class="rt-desc">Fixed deposit, recurring deposit, and PPF maturity value.</p></a>
+<a class="related-card" href="retirement-calculator.html"><p class="rt-title">Retirement Calculator</p><p class="rt-desc">Work out the corpus and monthly SIP you need to retire comfortably.</p></a>
+<a class="related-card" href="government-schemes-calculator.html"><p class="rt-title">Govt Schemes Calculator</p><p class="rt-desc">Sukanya Samriddhi, SCSS, NSC, KVP and Post Office MIS.</p></a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap" style="padding:0;">
+    This tool provides general, educational estimates only — it is not financial, tax, or investment advice. Actual returns, interest rates, and tax rules vary and change over time; please verify current rates and consult a certified financial advisor or chartered accountant before making decisions.
+  </div>
+</footer>
+
+<script src="assets/calculators.js"></script>
+</body>
+</html>
